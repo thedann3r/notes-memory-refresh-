@@ -1,4 +1,4 @@
-from Flask import Flask, jsonify, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models import db
@@ -12,7 +12,7 @@ CORS(app)
 
 @app.route("/")
 def index():
-    return "Hello, Dann is refreshing his memory on Flask and SQLAlchemy!"
+    return "Hello, Dann is refreshing his memory on Flask and React!"
 
 if __name__ =="__main__":
     app.run(debug = True)
