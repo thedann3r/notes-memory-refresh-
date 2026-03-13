@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class Note(db.Model):
+class Notes(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(50), nullable = False)
     content = db.Column(db.Text, nullable = True)
