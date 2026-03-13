@@ -19,5 +19,5 @@ def index():
 
 api.add_resource(Note, "/notes")
 
-if __name__ =="__main__":
+if __name__ == "__main__":
     app.run(debug = True)

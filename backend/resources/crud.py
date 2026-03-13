@@ -7,5 +7,5 @@ api = Api(app)
 
 class Note(Resource):
     def get(self):
-        notes = Notes.query.get.all()
+        notes = Notes.query.all()
         return[note.to_dict() for note in notes], 200
