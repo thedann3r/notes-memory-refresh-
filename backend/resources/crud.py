@@ -12,12 +12,29 @@ class Note(Resource):
     
     def post(self):
         data = request.get_json()
-
         new_note = Notes(
-            title = data.get("title"),
-            content = data["content"]
+            title = data.get('title'),
+            content = data['content']
         )
         db.session.add(new_note)
         db.session.commit()
 
         return new_note.to_dict(), 201
+    
+    def patch(self, id):
+        note = Notes.query.get(id)
+
+        if not note:
+            return {"error": "Note not found"}, 404
+        
+        data = Notes.request.get_json()
+
+        if "title" in data:
+            note.title = data["title"]
+
+        if "content" in data:
+            note.content = data.get("content")
+
+        db.session.commit()
+
+        return note.to_dict(), 200
