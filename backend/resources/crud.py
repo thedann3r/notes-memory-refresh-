@@ -25,16 +25,18 @@ class Note(Resource):
         note = Notes.query.get(id)
 
         if not note:
-            return {"error": "Note not found"}, 404
+            return {"error": "The note was not found, please try again"}, 404
         
-        data = Notes.request.get_json()
+        data = request.get_json()
 
         if "title" in data:
-            note.title = data["title"]
+            note.title = data.get("title")
 
         if "content" in data:
-            note.content = data.get("content")
+            note.content = data["content"]
 
         db.session.commit()
 
         return note.to_dict(), 200
+
+        

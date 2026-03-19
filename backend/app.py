@@ -23,7 +23,7 @@ CORS(app)
 def index():
     return "Hello, Dann is refreshing his memory on Flask and React!"
 
-api.add_resource(Note, "/notes")
+api.add_resource(Note, "/notes", "/notes/<int:id>")
 
 if __name__ == "__main__":
     app.run(debug=True)
