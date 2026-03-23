@@ -6,7 +6,16 @@ from flask_restful import Resource, Api
 # api = Api(app)
 
 class Note(Resource):
-    def get(self):
+    def get(self, id = None):
+
+        if id:
+            note = Notes.query.get(id)  
+
+            if not note:
+                return {"error": "Note not found!"}, 404
+            
+            return note.to_dict(), 200
+    
         notes = Notes.query.all()
         return [note.to_dict() for note in notes], 200
     
