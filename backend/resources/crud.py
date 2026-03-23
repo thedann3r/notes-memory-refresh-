@@ -25,18 +25,29 @@ class Note(Resource):
         note = Notes.query.get(id)
 
         if not note:
-            return {"error": "The note was not found, please try again"}, 404
+            return {"error": "Note not found!"}, 404
         
         data = request.get_json()
 
         if "title" in data:
-            note.title = data.get("title")
+            note.title = data['title']
 
         if "content" in data:
-            note.content = data["content"]
+            note.content = data.get('content')
 
         db.session.commit()
 
         return note.to_dict(), 200
+    
+    def delete(self, id):
+        note = Notes.query.get(id)
+
+        if not note:
+            return{"error": "Note not found!"}, 404
+        
+        db.session.delete(note)
+        db.session.commit()
+
+        return {"message": "Note deleted successfully!"}, 200
 
         
