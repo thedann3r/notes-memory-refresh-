@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from models import db, Notes
 from flask_restful import Resource, Api
-from resources.crud import Note
+from resources.crud import Note, User
 
 app = Flask(__name__)
 
@@ -24,6 +24,7 @@ def index():
     return "Hello, Dann is refreshing his memory on Flask and React!"
 
 api.add_resource(Note, "/notes", "/notes/<int:id>")
+api.add_resource(User, "/users", "/users/<int:id>")
 
 if __name__ == "__main__":
     app.run(debug=True)
