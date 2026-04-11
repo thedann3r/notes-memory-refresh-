@@ -87,5 +87,37 @@ class User(Resource):
 
         return new_user.to_dict(), 201
     
+    def patch(self, id):
+        user = Users.query.get(id)
+
+        if not user:
+            return {"error": "User not found!"}, 404
+        
+        data = request.get_json()
+
+        if "name" in data:
+            user.name = data.get('name')
+
+        if "email" in data:
+            user.email = data['email']
+
+        if "password" in data:
+            user.password = data.get('password')
+
+        db.session.commit()
+
+        return user.to_dict(), 200
+    
+    def delete(self, id):
+        user = User.query.get(id)
+
+        if not user:
+            return {"error": "user not found!"}, 404
+        
+        db.session.delete(user)
+        db.session.commit()
+
+        return {"message": "user deleted successfully!"}, 200
+    
 
         
