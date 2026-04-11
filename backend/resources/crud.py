@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from models import db, Notes
+from models import db, Notes, Users
 from flask_restful import Resource, Api
 
 # app = Flask(__name__)
@@ -57,6 +57,7 @@ class Note(Resource):
         db.session.delete(note)
         db.session.commit()
 
-        return {"message": "Note deleted successfully!"}, 200
+        return {"message": "Note deleted successfully!"}, 200   
+    
 
         
