@@ -60,4 +60,32 @@ class Note(Resource):
         return {"message": "Note deleted successfully!"}, 200   
     
 
+class User(Resource):
+    def get(self, id = None):
+
+        if id:
+            user = Users.query.get(id)
+            if not user:
+                return {"error": "User not found!"}, 404
+            
+            return user.to_dict(), 200
+        
+        users = Users.query.all()
+
+        return [user.to_dict() for user in users], 200
+    
+    def post(self):
+        data = request.get_json()
+        new_user = Users(
+            name = data.get('name'),
+            email = data['email'],
+            password = data.get('password')
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return new_user.to_dict(), 201
+    
+
         
