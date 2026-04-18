@@ -10,7 +10,7 @@ class Users(db.Model, SerializerMixin):
     email = db.Column(db.String(120), nullable = False, unique = True)
     password = db.Column(db.String(120), nullable = False)
 
-    notes = db.relationship("Notes", back_populates = "user", cascade = "all, delete orphan")
+    notes = db.relationship("Notes", back_populates = "user", cascade = "all, delete-orphan")
 
     serialize_rules = ("-password", "-notes.user")
 

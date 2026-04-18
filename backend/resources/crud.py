@@ -23,7 +23,8 @@ class Note(Resource):
         data = request.get_json()
         new_note = Notes(
             title = data.get('title'),
-            content = data['content']
+            content = data['content'],
+            user_id = data['user_id']
         )
         db.session.add(new_note)
         db.session.commit()
