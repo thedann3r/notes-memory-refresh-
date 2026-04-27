@@ -117,8 +117,7 @@ class DeleteAcc(Resource):
 
         return {'message': 'Account permanently deleted!'}, 200
         
-
-
+        
 api.add_resource(Note, "/notes", "/notes/<int:id>")
 api.add_resource(User, "/users", "/users/<int:id>")
 api.add_resource(Signup, "/signup")

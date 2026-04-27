@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from models import db, Notes, Users
 from flask_restful import Resource, Api
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # app = Flask(__name__)
 # api = Api(app)
@@ -62,33 +63,35 @@ class Note(Resource):
     
 
 class User(Resource):
-    def get(self, id = None):
 
-        if id:
-            user = Users.query.get(id)
-            if not user:
-                return {"error": "User not found!"}, 404
-            
-            return user.to_dict(), 200
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+
+        user = Users.query.get(current_user)
+        if not user:
+            return {"error": "User not found!"}, 404
         
-        users = Users.query.all()
-
-        return [user.to_dict() for user in users], 200
+        return user.to_dict(), 202
     
-    def post(self):
-        data = request.get_json()
-        new_user = Users(
-            name = data.get('name'),
-            email = data['email'],
-            password = data.get('password')
-        )
+        # if id:
+        #     user = Users.query.get(id)
+        #     if not user:
+        #         return {"error": "User not found!"}, 404
+            
+        #     return user.to_dict(), 200
+        
+        # users = Users.query.all()
 
-        db.session.add(new_user)
-        db.session.commit()
-
-        return new_user.to_dict(), 201
-    
+        # return [user.to_dict() for user in users], 200
+ 
+    @jwt_required()
     def patch(self, id):
+        current_user = get_jwt_identity()
+
+        if current_user != id:
+            return {"error": "Unauthorized!"}, 403
+        
         user = Users.query.get(id)
 
         if not user:
@@ -109,16 +112,6 @@ class User(Resource):
 
         return user.to_dict(), 200
     
-    def delete(self, id):
-        user = User.query.get(id)
-
-        if not user:
-            return {"error": "user not found!"}, 404
-        
-        db.session.delete(user)
-        db.session.commit()
-
-        return {"message": "user deleted successfully!"}, 200
     
 
         
