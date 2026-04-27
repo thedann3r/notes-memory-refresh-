@@ -100,12 +100,29 @@ class Login(Resource):
             }, 200
         
         return {"error": "Invalid email or password!"}, 401
+    
+class DeleteAcc(Resource):
+    @jwt_required()
+    def delete(self):
+        # JWT identity = user_id (as you set in login/signup)
+        user_id = get_jwt_identity()
+
+        user = Users.query.get(user_id)
+        if not user:
+            return {'error': 'User does not exist!'}, 404
+
+        # hard delete
+        db.session.delete(user)
+        db.session.commit()
+
+        return {'message': 'Account permanently deleted!'}, 200
+        
 
 
 api.add_resource(Note, "/notes", "/notes/<int:id>")
 api.add_resource(User, "/users", "/users/<int:id>")
 api.add_resource(Signup, "/signup")
 api.add_resource(Login, "/login")
-
+api.add_resource(DeleteAcc, "/delete-account")
 if __name__ == "__main__":
     app.run(debug=True)
