@@ -105,9 +105,9 @@ class DeleteAcc(Resource):
     @jwt_required()
     def delete(self):
         # JWT identity = user_id (as you set in login/signup)
-        user_id = get_jwt_identity()
+        current_user = get_jwt_identity()
 
-        user = Users.query.get(user_id)
+        user = Users.query.get(current_user)
         if not user:
             return {'error': 'User does not exist!'}, 404
 
