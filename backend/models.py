@@ -12,7 +12,7 @@ class Users(db.Model, SerializerMixin):
 
     notes = db.relationship("Notes", back_populates = "user", cascade = "all, delete-orphan")
 
-    serialize_rules = ("-password", "-notes.user")
+    serialize_rules = ("-password", "-notes.user",)
 
 class Notes(db.Model, SerializerMixin):
     __tablename__ = "notes"

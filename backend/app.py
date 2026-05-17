@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from datetime import timedelta
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models import db, Notes, Users
@@ -14,6 +15,8 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY") or "dev-secret-key"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes = 15)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days = 7)
 
 # initialize database first
 db.init_app(app)
@@ -46,7 +49,7 @@ class Signup(Resource):
         # check duplicate email
         existing_user = Users.query.filter_by(email=email).first()
         if existing_user:
-            return {"error": "Email already exists"}, 409
+            return {"error": "Email already exists"}, 409 
 
         # check password match
         if password != confirm_password:
@@ -65,10 +68,11 @@ class Signup(Resource):
         db.session.commit()
 
         access_token = create_access_token(identity=new_user.id)
-
+        refresh_token = create_refresh_token(identity=new_user.id)
         return {
             "message": "User created successfully!",
             "access_token": access_token,
+            "refresh_token": refresh_token,
             "user": {
                 "id": new_user.id,
                 "name": new_user.name,
@@ -85,12 +89,11 @@ class Login(Resource):
 
         user = Users.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            create_token = create_access_token(identity = {'id': user.id, 'name': user.name, 'email': user.email})
-            refresh_token = create_refresh_token(identity = {'id': user.id, 'name': user.name, 'email': user.email})
-
+            access_token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id)
             return{
                 "message":"Login successfully",
-                "create_token": create_token,
+                "access_token": access_token,
                 "refresh_token": refresh_token,
                 "user":{
                     "id": user.id,
@@ -116,12 +119,24 @@ class DeleteAcc(Resource):
         db.session.commit()
 
         return {'message': 'Account permanently deleted!'}, 200
+    
+class RefreshToken(Resource):
+    @jwt_required(refresh=True)
+    def post(self):
+        user_id = get_jwt_identity()
+
+        new_access_token = create_access_token(identity=user_id)
+
+        return {
+            "access_token": new_access_token
+        }, 200
         
         
 api.add_resource(Note, "/notes", "/notes/<int:id>")
 api.add_resource(User, "/users", "/users/<int:id>")
 api.add_resource(Signup, "/signup")
 api.add_resource(Login, "/login")
+api.add_resource(RefreshToken, "/refresh")
 api.add_resource(DeleteAcc, "/delete-account")
 if __name__ == "__main__":
     app.run(debug=True)
