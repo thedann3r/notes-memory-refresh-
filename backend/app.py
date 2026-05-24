@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from datetime import timedelta
+from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models import db, Notes, Users
@@ -7,6 +8,7 @@ from flask_restful import Resource, Api
 from resources.crud import Note, User
 from flask_bcrypt import Bcrypt
 import re
+import requests
 import os
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 
@@ -18,6 +20,9 @@ app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY") or "dev-secret-key"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes = 15)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days = 7)
 
+EMAIL_VALIDATION_API_KEY = os.getenv("EMAIL_VALIDATION_API_KEY")
+EMAIL_VALIDATION_API_URL = os.getenv("EMAIL_VALIDATION_API_URL")
+
 # initialize database first
 db.init_app(app)
 
@@ -28,10 +33,40 @@ api = Api(app)
 CORS(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
+load_dotenv()
 
 @app.route("/")
 def index():
     return "Hello, Dann is refreshing his memory on Flask and React!"
+
+def is_valid_email(email):
+    return bool(re.match(r"[^@]+@[^@]+\.[^@]+", email))
+
+
+def is_strong_password(password):
+    return bool(
+        re.match(
+            r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$",
+            password
+        )
+    )
+
+
+def is_real_email(email):
+    try:
+        response = requests.get(
+            f"{EMAIL_VALIDATION_API_URL}?email={email}&api_key={EMAIL_VALIDATION_API_KEY}"
+        )
+
+        data = response.json()
+
+        return (
+            response.status_code == 200 and
+            data.get("data", {}).get("result") == "deliverable"
+        )
+
+    except Exception:
+        return False
 
 class Signup(Resource):
     def post(self):
@@ -45,6 +80,15 @@ class Signup(Resource):
         # basic validation
         if not name or not email or not password or not confirm_password:
             return {"error": "All fields are required"}, 400
+
+        if not is_valid_email(email):
+            return {"error": "Invalid email format"}, 400
+
+        if not is_strong_password(password):
+            return {"error": "Password must be at least 8 characters long and contain both letters and numbers"}, 400
+
+        if not is_real_email(email):
+            return {"error": "This email address is not valid"}, 400
 
         # check duplicate email
         existing_user = Users.query.filter_by(email=email).first()
