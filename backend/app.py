@@ -8,6 +8,7 @@ from flask_restful import Resource, Api
 from resources.crud import Note, User
 from flask_bcrypt import Bcrypt
 import re
+# import secrets
 import requests
 import os
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
@@ -16,7 +17,7 @@ app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY") or "dev-secret-key"
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default_secret_key")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes = 15)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days = 7)
 
@@ -111,8 +112,8 @@ class Signup(Resource):
         db.session.add(new_user)
         db.session.commit()
 
-        access_token = create_access_token(identity=new_user.id)
-        refresh_token = create_refresh_token(identity=new_user.id)
+        access_token = create_access_token(identity=str(new_user.id))
+        refresh_token = create_refresh_token(identity=str(new_user.id))
         return {
             "message": "User created successfully!",
             "access_token": access_token,
@@ -133,8 +134,8 @@ class Login(Resource):
 
         user = Users.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            access_token = create_access_token(identity=user.id)
-            refresh_token = create_refresh_token(identity=user.id)
+            access_token = create_access_token(identity=str(user.id))
+            refresh_token = create_refresh_token(identity=str(user.id))
             return{
                 "message":"Login successfully",
                 "access_token": access_token,

@@ -24,7 +24,7 @@ class Note(Resource):
 
     @jwt_required()
     def get(self):
-        current_user =  get_jwt_identity()
+        current_user = int(get_jwt_identity())
 
         notes = Notes.query.filter_by(user_id=current_user).all()
         return [note.to_dict() for note in notes], 200
@@ -32,7 +32,7 @@ class Note(Resource):
     @jwt_required()
     def post(self):
 
-        current_user = get_jwt_identity()
+        current_user = int(get_jwt_identity())
 
         data = request.get_json()
         new_note = Notes(
@@ -48,7 +48,7 @@ class Note(Resource):
     @jwt_required()
     def patch(self, id):
 
-        current_user = get_jwt_identity()
+        current_user = int(get_jwt_identity())
 
         # if current_user != id:
         #     return {"error": "Unauthorized!"}, 403
@@ -72,7 +72,7 @@ class Note(Resource):
     @jwt_required()
     def delete(self, id):
 
-        current_user = get_jwt_identity()
+        current_user = int(get_jwt_identity())
 
         note = Notes.query.get(id)
 
