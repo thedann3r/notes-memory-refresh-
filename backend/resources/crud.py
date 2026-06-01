@@ -126,6 +126,12 @@ class User(Resource):
             user.name = data.get('name')
 
         if "email" in data:
+
+            existing_user = Users.query.filter_by(email=data["email"]).first()
+
+            if existing_user and existing_user.id != user.id:
+                return {"error": "Email already exists"}, 409
+            
             user.email = data.get('email')
 
         # if "password" in data:

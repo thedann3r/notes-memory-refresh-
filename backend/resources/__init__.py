@@ -11,6 +11,13 @@
 }
 
 {
+    "name":"danner",
+    "email":"danner@gmail.com",
+    "current_password":"dann1234",
+    "new_password":"danner1234"
+}
+
+{
     "title": "Learning Flask",
     "content": "JWT authentication is working"
 }

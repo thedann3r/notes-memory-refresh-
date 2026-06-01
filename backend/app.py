@@ -163,7 +163,7 @@ class DeleteAcc(Resource):
         db.session.delete(user)
         db.session.commit()
 
-        return {'message': 'Account permanently deleted!'}, 200
+        return {'message': 'Account deleted successfully!'}, 200
     
 class RefreshToken(Resource):
     @jwt_required(refresh=True)
