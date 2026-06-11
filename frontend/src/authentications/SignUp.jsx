@@ -1,85 +1,88 @@
-import React, { useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const url = "http://127.0.0.1:5000"
+const url = "http://127.0.0.1:5000";
 
 function SignupForm() {
-    const [token, setToken] = useState(localStorage.getItem('access_token'))
-    const [user, setUser] = useState(null)
+  const navigate = useNavigate();
 
-    const handleSignup = (e) => {
-        e.preventDefault()
-        const formData = new FormData(e.target)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-        const password = formData.get('password')
-        const confirmPassword = formData.get('confirm_password')
+  const handleSignup = (e) => {
+    e.preventDefault();
 
-        // ✅ Check if passwords match before sending request
-        if (password !== confirmPassword) {
-            alert("Passwords do not match! Please try again.")
-            return
+    const formData = new FormData(e.target);
+
+    const password = formData.get("password");
+    const confirmPassword = formData.get("confirm_password");
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    fetch(`${url}/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: formData.get("name"),
+        email: formData.get("email"),
+        password,
+        confirm_password: confirmPassword,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((data) => {
+            throw new Error(data.error);
+          });
         }
+        return res.json();
+      })
+      .then((data) => {
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("refresh_token", data.refresh_token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-        fetch(`${url}/signup`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: formData.get('name'),
-                email: formData.get('email'),
-                password: password,
-                confirm_password: confirmPassword, // ✅ Send confirm_password for validation
-                role: formData.get('role') || 'user' 
-            }),
-        })
-        .then((response) => {
-            if (response.ok) {
-                return response.json()
-            } else {
-                return response.json().then((data) => {
-                    alert(data.error || 'Error signing up')
-                    throw new Error('Error signing up')
-                })
-            }
-        })
-        .then((data) => {
-            setToken(data.create_token)
-            setUser({ name: data.user.name, role: data.role })
-            localStorage.setItem("access_token", data.create_token)
+        alert(`Welcome ${data.user.name}`);
 
-            alert(`Welcome ${data.user.name}, your account has been created as a ${data.role || 'user'}.`)
-        })
-        .catch((error) => {
-            console.error("Signup error:", error)
-        })
-    }
+        navigate("/notes"); // 👈 important
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  };
 
-    if (token) {
-        return <Navigate to="/login" />
-    }
+  return (
+    <form onSubmit={handleSignup}>
+      <input name="name" placeholder="Name" />
+      <input name="email" placeholder="Email" />
 
-    return (
-        <div className="signupContainer">
-            <div className="signupCard">
-                <div className="signupLeft">
-                    <div className="signupImagePlaceholder">
-                        <img src="https://cdn.create.vista.com/api/media/small/426382906/stock-photo-hostel-dormitory-beds-arranged-in-room" alt="signup" />
-                    </div>
-                </div>
-                <div className="signupRight">
-                    <h2>Create an Account</h2>
-                    <form className="signupForm" onSubmit={handleSignup}>
-                        <input className="signupInput" type="text" name="name" placeholder="Enter name..." required />
-                        <input className="signupInput" type="email" name="email" placeholder="Enter email..." required />
-                        {/* <input className="signupInput" type="text" name="role" placeholder="Enter role..." required /> */}
-                        <input className="signupInput" type="password" name="password" placeholder="Enter password..." required />
-                        <input className="signupInput" type="password" name="confirm_password" placeholder="Confirm password..." required />
-                        <button className="signupButton" type="submit">Sign Up</button>
-                    </form>
-                    <p className="signupFooter">Already have an account? <a href="/login">Log in</a></p>
-                </div>
-            </div>
-        </div>
-    )
-}    
+      <input
+        name="password"
+        type={showPassword ? "text" : "password"}
+        placeholder="Password"
+      />
+      <span onClick={() => setShowPassword(!showPassword)}>
+        {showPassword ? <FaEyeSlash /> : <FaEye />}
+      </span>
 
-export default SignupForm
+      <input
+        name="confirm_password"
+        type={showConfirm ? "text" : "password"}
+        placeholder="Confirm Password"
+      />
+      <span onClick={() => setShowConfirm(!showConfirm)}>
+        {showConfirm ? <FaEyeSlash /> : <FaEye />}
+      </span>
+
+      <button type="submit">Sign Up</button>
+    </form>
+  );
+}
+
+export default SignupForm;
