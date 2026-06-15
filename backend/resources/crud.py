@@ -122,6 +122,13 @@ class User(Resource):
         
         data = request.get_json() or {}
 
+        current_password = data.get("current_password")
+        if not current_password:
+            return {"error": "Current password is required"}, 400
+
+        if not bcrypt.check_password_hash(user.password, current_password):
+            return {"error": "Incorrect current password"}, 401
+
         if "name" in data:
             user.name = data.get('name')
 
@@ -143,12 +150,12 @@ class User(Resource):
             if not new_password.strip():
                 return {"error": "New password cannot be empty"}, 400
 
-            current_password = data.get("current_password")
-            if not current_password:
-                return {"error": "Current password is required"}, 400
+            # current_password = data.get("current_password")
+            # if not current_password:
+            #     return {"error": "Current password is required"}, 400
 
-            if not bcrypt.check_password_hash(user.password, current_password):
-                return {"error": "Incorrect current password"}, 401
+            # if not bcrypt.check_password_hash(user.password, current_password):
+            #     return {"error": "Incorrect current password"}, 401
 
             user.password = bcrypt.generate_password_hash(new_password).decode("utf-8")
 
