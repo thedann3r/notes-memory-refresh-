@@ -58,30 +58,34 @@ function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSignup}>
-      <input name="name" placeholder="Name" />
-      <input name="email" placeholder="Email" />
+    <div>
+      <form onSubmit={handleSignup}>
+        <input name="name" placeholder="Name" />
+        <input name="email" placeholder="Email" />
 
-      <input
-        name="password"
-        type={showPassword ? "text" : "password"}
-        placeholder="Password"
-      />
-      <span onClick={() => setShowPassword(!showPassword)}>
-        {showPassword ? <FaEyeSlash /> : <FaEye />}
-      </span>
+        <input
+          name="password"
+          // placeholder="Password"
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+        />
+        <span onClick={() => setShowPassword(!showPassword)}>
+          {showPassword ? <FaEyeSlash /> : <FaEye />}
+        </span>
 
-      <input
-        name="confirm_password"
-        type={showConfirm ? "text" : "password"}
-        placeholder="Confirm Password"
-      />
-      <span onClick={() => setShowConfirm(!showConfirm)}>
-        {showConfirm ? <FaEyeSlash /> : <FaEye />}
-      </span>
+        <input
+          name="confirm_password"
+          type={showConfirm ? "text" : "password"}
+          placeholder="Confirm Password"
+        />
+        <span onClick={() => setShowConfirm(!showConfirm)}>
+          {showConfirm ? <FaEyeSlash /> : <FaEye />}
+        </span>
 
-      <button type="submit">Sign Up</button>
-    </form>
+        <button type="submit">Sign Up</button>
+        <p>Already have an account? <a href = "/login">Login</a> </p>
+      </form>
+    </div>
   );
 }
 
