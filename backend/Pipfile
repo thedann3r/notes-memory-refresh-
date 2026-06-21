@@ -15,6 +15,9 @@ flask-jwt-extended = "*"
 python-dotenv = "*"
 flask-bcrypt = "*"
 requests = "*"
+datetime = "*"
+pyjwt = "*"
+flask-mail = "*"
 
 [dev-packages]
 
