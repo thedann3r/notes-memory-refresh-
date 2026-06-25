@@ -107,9 +107,15 @@ function LoginForm() {
             Signup
           </Link>
         </p>
+
+        <Link to="/forgot-password">
+          Forgot password?
+        </Link>
+        
       </form>
     </div>
   );
 }
+
 
 export default LoginForm;

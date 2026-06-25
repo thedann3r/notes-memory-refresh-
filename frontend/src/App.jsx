@@ -10,6 +10,8 @@ import Note from './notes/Note'
 import './App.css'
 import Profile from './profile/Profile'
 import Logout from './authentications/LogOut'
+import ForgotPassword from './authentications/ForgotPassword'
+import ResetPassword from './authentications/ResetPassword'
 
 function App() {
   return(
@@ -21,6 +23,8 @@ function App() {
         <Route path = '/notes' element = {<Note/>} />
         <Route path = '/profile' element = {<Profile/>} />
         <Route path = '/logout' element = {<Logout/>} />
+        <Route path = '/forgot-password' element = {<ForgotPassword/>} />
+        <Route path = '/reset-password' element = {<ResetPassword/>} />
       </Routes>
     </Router>
   )

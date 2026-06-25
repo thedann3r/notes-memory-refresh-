@@ -1,79 +1,81 @@
-// import React, { useState } from 'react';
-// import momma from "../assets/mommanut.png"
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-// const url = "http://127.0.0.1:5000";
+const url = "http://127.0.0.1:5000";
 
-// function ForgotPassword() {
-//     const [email, setEmail] = useState('');
-//     const [message, setMessage] = useState('');
-//     const [error, setError] = useState('');
-//     const [loading, setLoading] = useState(false);
+function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-//     const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true); // Start loading
+  function handleSubmit(e) {
+    e.preventDefault();
 
-//     try {
-//         const res = await fetch(`${url}/forgot-password`, {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify({ email }),
-//         });
+    setLoading(true);
+    setMessage("");
+    setError("");
 
-//         const data = await res.json();
+    fetch(`${url}/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+      }),
+    })
+      .then((res) =>
+        res.json().then((data) => ({
+          ok: res.ok,
+          data,
+        }))
+      )
+      .then(({ ok, data }) => {
+        if (!ok) {
+          setError(data.error);
+          return;
+        }
 
-//         if (!res.ok) {
-//             setError(data.error || "Something went wrong");
-//             setMessage('');
-//         } else {
-//             setMessage(data.message);
-//             setError('');
-//         }
-//     } catch (err) {
-//         setError("Server error");
-//     } finally {
-//         setLoading(false); // End loading
-//     }
-// };
+        setMessage(data.message);
+        setEmail("");
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Server error");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
 
-//     return (
-//         <div className="signupContainer">
+  return (
+    <div className="forgot-password-container">
+      <h2>Forgot Password</h2>
 
-//             <div className="signupCard">
-//                 <div className="signupLeft">
-//                     <div className="signupImagePlaceholder">
-//                         <img src={momma} alt="momma nut" />
-//                         {/* <img src="https://cdn.create.vista.com/api/media/small/426382906/stock-photo-hostel-dormitory-beds-arranged-in-room" alt="signup" /> */}
-//                     </div>
-//                 </div>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          required
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-//                 <div className="signupRight">
-//                     <form className="signupForm" onSubmit={handleSubmit}>
+        <button type="submit" disabled={loading}>
+          {loading ? "Sending..." : "Send Reset Link"}
+        </button>
+      </form>
 
-//                     <h2>Forgot Password</h2>
+      {message && <p>{message}</p>}
+      {error && <p>{error}</p>}
 
-//                         <input
-//                             className="signupInput"
-//                             type="email"
-//                             placeholder="Enter your email"
-//                             value={email}
-//                             onChange={(e) => setEmail(e.target.value)}
-//                             required
-//                         /> 
+      <p>
+        Remember your password?{" "}
+        <Link to="/login">Login</Link>
+      </p>
+    </div>
+  );
+}
 
-//                         <p className="signupFooter">Already have an account? <a href="./login">Log in</a></p>
-
-//                         <button className="signupButton" type="submit" disabled={loading}>
-//                             {loading ? "Sending..." : "Send Reset Link"}
-//                         </button>
-
-//                     </form>
-//                 </div>
-//                 {message && <p className="text-green-600">{message}</p>}
-//                 {error && <p className="text-red-600">{error}</p>}
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default ForgotPassword;
+export default ForgotPassword;
