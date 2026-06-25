@@ -18,6 +18,8 @@ from email_utility import send_password_reset_email
 from flask_mail import Mail, Message
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 
+load_dotenv()
+
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
@@ -49,7 +51,6 @@ api = Api(app)
 CORS(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
-load_dotenv()
 
 @app.route("/")
 def index():
@@ -252,7 +253,7 @@ class ResetPassword(Resource):
         try:
             payload = decode(
                 token,
-                app.config["SECRET_KEY"],
+                app.config["JWT_SECRET_KEY"],
                 algorithms=["HS256"]
             )
 
