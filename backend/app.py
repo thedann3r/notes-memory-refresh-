@@ -18,7 +18,7 @@ from email_utility import send_password_reset_email
 from flask_mail import Mail, Message
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 
-load_dotenv()
+load_dotenv(override=True)
 
 app = Flask(__name__)
 
@@ -209,10 +209,8 @@ class ForgotPassword(Resource):
         expires = datetime.timedelta(minutes=15)
 
         reset_token = create_access_token(
-            identity={
-                "id": user.id,
-                "email": user.email
-            },
+            identity=str(user.id),
+            additional_claims={"email": user.email},
             expires_delta=expires
         )
 
@@ -257,7 +255,7 @@ class ResetPassword(Resource):
                 algorithms=["HS256"]
             )
 
-            user_id = payload["sub"]["id"]
+            user_id = payload["sub"]
 
             user = Users.query.get(user_id)
 
